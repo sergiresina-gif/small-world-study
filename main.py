@@ -8,8 +8,8 @@ import numpy as np
 # print( "Input number of neighbours (k): ")
 # k = int(input())
 
-N = 500
-K = 4
+N = 100
+K = 20
 
 do_you_want_plots = False
 
@@ -95,13 +95,22 @@ if ( do_you_want_plots ):
     nx.draw(B, with_labels=True, pos=nx.circular_layout(B, scale=100))
     plt.show()
 
-D = watts_strogatz(N,K, 0.1)
 
-print("Waltz-Strogatz")
-print("L = ", L(D))
-print("C = ", C(D))
-print()
+# for beta in [0, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1]:
+#     D = watts_strogatz(N,K, beta)
 
-if ( do_you_want_plots ):
-    nx.draw(D, with_labels=True, pos=nx.circular_layout(D, scale=100))
-    plt.show()
+#     print("Waltz-Strogatz")
+#     print(beta)
+#     print("L = ", L(D))
+#     print("C = ", C(D))
+#     print()
+
+#     if ( do_you_want_plots ):
+#         nx.draw(D, with_labels=True, pos=nx.circular_layout(D, scale=100))
+#         plt.show()
+
+for beta in [0.01, 0.05, 0.1]:
+    for N in [100,200,300,500,1000]:
+        for K in [4,5,10]:
+            D = watts_strogatz(N,K, beta)
+            print(f"Amb N={N}, K={K} i beta={beta}: tenim {L(D)}")
