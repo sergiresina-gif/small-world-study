@@ -27,6 +27,12 @@ def anell_regular(N,k):
             A.add_edge(node,( node - neighbour_right )%N )
     return A
 
+def L(G):
+    return nx.average_shortest_path_length(G)
+
+def C(G):
+    return nx.average_clustering(G)
+
 # match choice:
 #     case 1:
 #         A = anell_regular(N,k)
@@ -34,6 +40,10 @@ def anell_regular(N,k):
 #         pass    
 
 A = anell_regular(N,k)
+
+print("L = ", L(A))
+print("C = ", C(A))
+
 nx.draw_spring(A, with_labels=True)
 plt.show()
 
