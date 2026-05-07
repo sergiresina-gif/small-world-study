@@ -109,8 +109,54 @@ if ( do_you_want_plots ):
 #         nx.draw(D, with_labels=True, pos=nx.circular_layout(D, scale=100))
 #         plt.show()
 
+from mpl_toolkits.mplot3d import Axes3D
+
+
+good_data = []
 for beta in [0.01, 0.05, 0.1]:
-    for N in [100,200,300,500,1000]:
-        for K in [4,5,10]:
+    N_list = []
+    K_list = []
+    L_list = []
+
+    for N in range(100,1000,50):
+        for K in [4,5,6,7,8,9,10]:
             D = watts_strogatz(N,K, beta)
-            print(f"Amb N={N}, K={K} i beta={beta}: tenim {L(D)}")
+            L_val = L(D)
+            N_list.append(N)
+            K_list.append(K)
+            L_list.append(L_val)
+            print(f"Amb N={N}, K={K} i beta={beta}: tenim {L_val}")
+            if ( abs(L_val -6) < 1 ):
+                good_data.append([N,K,beta,L_val])
+        
+
+    N_unique = sorted(set(N_list))
+    K_unique = sorted(set(K_list))
+    L_grid = np.array(L_list).reshape(len(K_unique), len(N_unique))
+    N_grid, K_grid = np.meshgrid(N_unique, K_unique)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    surf = ax.plot_surface(N_grid, K_grid, L_grid, cmap='viridis', shade=True)
+
+    ax.set_zlim(0, 20)
+
+    indicator_surface = ax.plot_surface(N_grid, K_grid, 
+                                     np.full_like(L_grid, 6), 
+                                     color='red', 
+                                     alpha=0.5,
+                                     edgecolor='red',
+                                     linewidth=0.5)
+
+    cbar = plt.colorbar(surf, ax=ax, pad=0.1)
+    cbar.set_label('L(D)', fontsize=12)
+
+    ax.set_xlabel('N')
+    ax.set_ylabel('K')
+    ax.set_zlabel('L(D)')
+    plt.show()
+
+print("\n\n===========")
+for element in good_data:
+    print(f"Amb N={element[0]}, K={element[1]} i beta={element[2]}: tenim {element[3]}")
+
