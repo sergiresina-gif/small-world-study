@@ -136,3 +136,83 @@ def search_parameters(betas, N_range, K_range, target_L=6, tolerance=1):
         results[beta] = {'N_list': N_list, 'K_list': K_list, 'L_list': L_list}
 
     return good_data, results
+
+def stationary_distribution(G):
+    """
+    Computes the stationary distribution of the random walk on G.
+    
+    For a k-regular network: uniform (1/N for each node)
+    For an irregular network: degree(node) / sum_of_degrees
+
+    Returns:
+        stat: numpy array with the stationary probability of each node
+    """
+    degrees = np.array([G.degree(n) for n in G.nodes()])
+    return degrees / degrees.sum()
+
+def random_walk_simulation(G, start_node=None):
+    '''
+    Simulates a random walk step by step
+    At each step the walker moves to a random neighbour uniformly
+
+    Parameters:
+        G: Graph to traverse
+        start_node: anchor for the walking process
+
+    Returns:
+        steps: number of steps spend to traverse all nodes. Necessary to compute cover time
+    '''
+    if start_node is None:
+        start_node = np.random.choice(list(G.nodes()))
+    
+    current = start_node
+    visited = {current}
+    path = [current]
+    steps = 0
+
+    while visited != set(G.nodes()):
+        neighbours = list(G.neighbors(current))
+        current = np.random.choice(neighbours)
+        visited.add(current)
+        path.append(current)
+        steps += 1
+
+    return steps
+
+def cover_time(G, n_simulations=100):
+    '''
+    Repeats the random walk to obtain the average cover time
+
+    Parameters:
+        G: Graph to traverse
+        n_simulations: number of times the process will be repeated
+
+    Returns:
+        cover_time: average cover time across the simulations
+    '''
+    cover_time = np.mean([random_walk_simulation(G) for _ in range(n_simulations)])
+    return cover_time
+
+def mixing_time(G, epsilon=0.01):
+    """
+    Computes the mixing time of a random walk on G
+
+    It's the number of steps until the probability 
+    distribution of the random walk is epsilon-close
+    to the stationry.distribution
+    """
+    N = len(G.nodes())
+    P = nx.to_numpy_array(G) # Transforms the graph into an adjacency matrix
+    P = P / P.sum(axis=1, keepdims=True) # Normalizes the rows
+    stat = stationary_distribution(G) # Reference stationary distribution
+
+    dist = np.zeros(N)
+    dist[0] = 1.0  
+    steps = 0
+
+    while np.max(np.abs(dist - stat)) > epsilon:
+        dist = dist @ P  # one step: propagate the distribution
+        steps += 1
+
+    return steps
+
