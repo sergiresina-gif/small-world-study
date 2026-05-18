@@ -170,7 +170,8 @@ def random_walk_simulation(G, start_node=None):
     path = [current]
     steps = 0
 
-    while visited != set(G.nodes()):
+    all_nodes = set(G.nodes())
+    while visited != all_nodes:
         neighbours = list(G.neighbors(current))
         current = np.random.choice(neighbours)
         visited.add(current)
