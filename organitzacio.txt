@@ -1,8 +1,8 @@
 Notebook
 - part que demana el profe a l'enunciat
-    - Per cada xarxa d'exemple, calcular L i C
-    - Representsar i calcular L i C (i L_0 i C_0) de xarxes d'exemple amb β ∈ {0.001, 0.005, 0.01, 0.05, 0.1, 0.5}
-        - Fer gràfic per cada beta (incloent 0 i 1) el valor de L_0 i C_0
+    - Per cada xarxa d'exemple, calcular L i C (done)
+    - Representsar i calcular L i C (i L_0 i C_0) de xarxes d'exemple amb β ∈ {0.001, 0.005, 0.01, 0.05, 0.1, 0.5} (done)
+        - Fer gràfic per cada beta (incloent 0 i 1) el valor de L_0 i C_0 (done)
     - Random Walk
         - Demostració distribució per xarxa irregular és igual a la regular (uniforme)
 
