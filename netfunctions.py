@@ -148,6 +148,7 @@ def stationary_distribution(G):
         stat: numpy array with the stationary probability of each node
     """
     degrees = np.array([G.degree(n) for n in G.nodes()])
+    # The degree is the number of edges (neighbours) connected to each node
     return degrees / degrees.sum()
 
 def random_walk_simulation(G, start_node=None):
@@ -200,7 +201,7 @@ def mixing_time(G, epsilon=0.01):
 
     It's the number of steps until the probability 
     distribution of the random walk is epsilon-close
-    to the stationry.distribution
+    to the stationary distribution
     """
     N = len(G.nodes())
     P = nx.to_numpy_array(G) # Transforms the graph into an adjacency matrix
