@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 
 def anell_regular(N,K):
     """
@@ -218,3 +219,39 @@ def mixing_time(G, epsilon=0.01):
 
     return steps
 
+# Poso aquesta funció aquí per si la necessitem en algun moment (de moment no és necessària)
+# Com que volem fer moltes simulacions i per xarxes grans, i el càclul de L és molt costós,
+# comprovem que una L aproximada per 100 nodes a l'atzar és prou bona
+def L_approx(G, n_samples=None):
+    """
+    Estima el camí mig (L) fent servir un mostreig de nodes font.
+    Si n_samples és None, calcula el valor exacte (lent).
+    """
+    nodes = list(G.nodes())
+    N = len(nodes)
+    
+    # Si la xarxa és petita o no especifiquem mostres, fem el càlcul exacte
+    if n_samples is None or n_samples >= N:
+        try:
+            return nx.average_shortest_path_length(G)
+        except (nx.NetworkXError, nx.NetworkXNoPath):
+            return float('inf')
+
+    # Triem n_samples nodes a l'atzar com a punts de partida
+    sources = random.sample(nodes, n_samples)
+    lengths = []
+
+    for source in sources:
+        # Calculem les distàncies des de 'source' a TOTS els altres nodes
+        # Això és un sol BFS (molt ràpid en xarxes no pesades)
+        path_lengths = nx.single_source_shortest_path_length(G, source)
+        
+        # Ignorem la distància al propi node (que és 0)
+        distancies = [v for k, v in path_lengths.items() if k != source]
+        lengths.extend(distancies)
+
+    # Si no hem trobat camins (xarxa desconnectada), retornem inf
+    if not lengths:
+        return float('inf')
+        
+    return np.mean(lengths)
