@@ -82,6 +82,13 @@ def watts_strogatz(N,K, beta):
                 C.add_edge(node, new_neighbour)
     return C
 
+def draw_graph(G: nx.Graph, title: str, pos=None):
+    if pos is None:
+        pos = nx.circular_layout(G, scale=100)
+    nx.draw(G, with_labels=True, pos=pos)
+    plt.title(title)
+    plt.show()
+
 def L(G):
     """
     Computes the average shortest path length of graph G using a built-in
@@ -102,6 +109,48 @@ def C(G):
         return nx.average_clustering(G)
     except nx.NetworkXError:
         return 0
+
+def prop_study(prop: float, beta: float):
+    Ns = range(100, 1001, 20)
+    ks = [N*prop for N in Ns]
+    Ls = []
+    Cs = []
+    Ls_norm = []
+    Cs_norm = []
+
+    print(f"### Study for prop={prop}, beta={beta} ###")
+    for i in range(len(Ns)):
+        N = Ns[i]
+        k = int(ks[i])
+        G0 = anell_regular(N, k)
+        L0 = L(G0)
+        C0 = C(G0)
+        
+        if beta != 0:
+            G = watts_strogatz(N, k, beta)
+            if L0 != 0: # Evitem dividir per zero
+                L_norm = L(G)/L0
+            else:
+                L_norm = float('inf')
+
+            if C0 != 0: # Evitem dividir per zero       
+                C_norm = C(G)/C0
+            else:
+                C_norm = float('inf')
+            # print(f"N={N}, k={k}, L_norm={L_norm:.5f}, C_norm={C_norm:.5f}")
+            Ls_norm.append(L_norm)
+            Cs_norm.append(C_norm)
+            Ls.append(L_norm*L0) 
+            Cs.append(C_norm*C0)
+
+        else: 
+            Ls.append(L0)
+            Cs.append(C0)
+            Ls_norm.append(1) # L_norm és 1 quan beta=0
+            Cs_norm.append(1) # C_norm és 1 quan beta=0
+            # print(f"N={N}, k={k}, L={L0:.5f}, C={C0:.5f}")
+    
+    return Ls, Cs, Ls_norm, Cs_norm
     
 def search_parameters(betas, N_range, K_range, target_L=6, tolerance=1):
     """
